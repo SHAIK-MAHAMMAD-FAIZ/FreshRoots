@@ -183,3 +183,4 @@ Access the application at `http://localhost:3000`.
    * Open `http://localhost:3000/farmer/add-product.html` to test preset autocompletion or speech-to-text crop listing.
 
 # FreshRoots
+# FreshRoots
