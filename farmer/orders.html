@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders — Fresh Roots Farmer</title>
+  <meta name="description" content="Manage incoming orders and update delivery status.">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--surface-line);
+    }
+    .orders-table th {
+      text-align: left;
+      padding: 14px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-faint);
+      border-bottom: 1px solid var(--surface-line);
+    }
+    .orders-table td {
+      padding: 14px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--surface-line);
+      vertical-align: middle;
+    }
+    .orders-table tr:last-child td {
+      border-bottom: none;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.03em;
+    }
+    .status-pending { background: rgba(255, 210, 63, 0.15); color: var(--yellow); }
+    .status-confirmed { background: rgba(107, 203, 61, 0.15); color: var(--green); }
+    .status-shipped { background: rgba(255, 107, 53, 0.15); color: var(--orange); }
+    .status-delivered { background: rgba(241, 247, 237, 0.1); color: var(--text-dim); }
+    .action-btn {
+      background: transparent;
+      border: 1px solid var(--surface-line);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+      margin-right: 6px;
+    }
+    .action-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+    .filter-chips {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .chip.active {
+      background: var(--green);
+      color: #0d1a08;
+      border-color: var(--green);
+    }
+    .empty-orders {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      display: none;
+    }
+    @media (max-width: 700px) {
+      .orders-table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Farmer Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="dashboard.html" class="logo"><span class="dot"></span>Fresh<span>Roots</span></a>
+      <ul class="farmer-nav-segment">
+        <li>
+          <a href="dashboard.html" data-i18n="dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="add-product.html" data-i18n="addProduct">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+            Add Product
+          </a>
+        </li>
+        <li>
+          <a href="orders.html" class="active" data-i18n="orders">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+          </a>
+        </li>
+        <li>
+          <a href="../index.html" data-i18n="viewStore">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            View Store
+          </a>
+        </li>
+      </ul>
+      <div class="nav-actions" style="display:flex; align-items:center; gap:12px;">
+        <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+          <option value="en">English</option>
+          <option value="te">తెలుగు (Telugu)</option>
+          <option value="hi">हिंदी (Hindi)</option>
+        </select>
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Daylight Mode">☀️ Daylight</button>
+        <a href="../login.html" class="nav-icon-btn" aria-label="Logout" title="Logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding: 48px 0 80px;">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Order management</span>
+        <h2>Orders</h2>
+      </div>
+      <p id="order-count">0 orders</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-chips" id="status-filters">
+      <button class="chip active" data-status="All">All</button>
+      <button class="chip" data-status="Pending">Pending</button>
+      <button class="chip" data-status="Confirmed">Confirmed</button>
+      <button class="chip" data-status="Shipped">Shipped</button>
+      <button class="chip" data-status="Delivered">Delivered</button>
+    </div>
+
+    <!-- Orders table -->
+    <div style="overflow-x:auto;">
+      <table class="orders-table" id="orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="orders-tbody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+      <div class="empty-orders" id="empty-orders">No orders found for this filter.</div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <p>&copy; 2026 Fresh Roots. Farmer dashboard.</p>
+      <div class="footer-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="add-product.html">Add Product</a>
+        <a href="orders.html">Orders</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/products.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="../js/farmer.js"></script>
+  <script>
+    let activeFilter = 'All';
+
+    async function renderOrders() {
+      await fetchOrdersFromBackend();
+      const tbody = document.getElementById('orders-tbody');
+      const empty = document.getElementById('empty-orders');
+      const count = document.getElementById('order-count');
+      const filtered = activeFilter === 'All' 
+        ? ORDERS 
+        : ORDERS.filter(o => o.status === activeFilter);
+      
+      count.textContent = `${filtered.length} order${filtered.length !== 1 ? 's' : ''}`;
+      
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      
+      tbody.innerHTML = filtered.map(order => {
+        const next = getNextStatus(order.status);
+        const phone = order.phone || '9876543210';
+        const waText = encodeURIComponent(`Namaste ${order.customer}, your FreshRoots farm order ${order.id} is ${order.status}. Total: ₹${order.total}.`);
+        const itemsStr = Array.isArray(order.items) ? order.items.join(', ') : order.items;
+        return `
+          <tr>
+            <td style="font-family:var(--font-mono); font-weight:600;">${order.id}</td>
+            <td>
+              <strong style="display:block;">${order.customer}</strong>
+              <div style="margin-top:4px; display:flex; gap:10px; font-size:12px;">
+                <a href="tel:${phone}" style="color:var(--green); text-decoration:underline;">📞 ${phone}</a>
+                <a href="https://wa.me/91${phone}?text=${waText}" target="_blank" rel="noopener" style="color:var(--yellow); text-decoration:underline;">💬 WhatsApp</a>
+              </div>
+              ${order.address ? `<div style="font-size:11px; color:var(--text-faint); margin-top:3px;">📍 ${order.address}</div>` : ''}
+            </td>
+            <td>${itemsStr}</td>
+            <td style="font-family:var(--font-mono); font-weight:600; color:var(--yellow);">₹${order.total}</td>
+            <td><span class="status-pill status-${order.status.toLowerCase()}">${order.status}</span></td>
+            <td>
+              ${next ? `<button class="action-btn" onclick="handleOrderStatusClick('${order.id}', '${next}')">Mark ${next}</button>` : `<span style="font-size:12px; color:var(--green);">✓ Completed</span>`}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function handleOrderStatusClick(orderId, nextStatus) {
+      await updateOrderStatus(orderId, nextStatus);
+      showToast(`Order ${orderId} updated to ${nextStatus}`);
+      renderOrders();
+    }
+
+    // Filter chips
+    document.querySelectorAll('#status-filters .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#status-filters .chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeFilter = chip.dataset.status;
+        renderOrders();
+      });
+    });
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', () => {
+      renderOrders();
+    });
+  </script>
+</body>
+</html>

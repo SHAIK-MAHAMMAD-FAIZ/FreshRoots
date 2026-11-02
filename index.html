@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fresh Roots — Farm to Consumer, Live</title>
+<meta name="description" content="Fresh Roots connects farmers directly with consumers — fresh produce, fair prices, no middlemen.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+ 
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><span class="dot"></span>Fresh<span>Roots</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="farmer/dashboard.html">Sell on Fresh Roots</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Daylight Mode">☀️ Daylight</button>
+      <a href="login.html" class="nav-icon-btn" aria-label="Account">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+      </a>
+      <a href="cart.html" class="nav-icon-btn" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg>
+        <span class="cart-count">0</span>
+      </a>
+      <button class="menu-toggle" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+ 
+<header class="hero">
+  <div class="container hero-inner">
+    <div>
+      <span class="eyebrow">// Live Farm Scan Network</span>
+      <h1>Produce, graded live.<br>Sold <span class="accent">straight from soil</span> to door.</h1>
+      <p>Fresh Roots cuts out the middlemen. Every listing is scanned for freshness the moment it's picked, so what you see is exactly what arrives — and farmers keep more of every rupee.</p>
+      <div class="hero-cta">
+        <a href="shop.html" class="btn btn-primary">
+          Browse the market
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#categories" class="btn btn-ghost">Shop by category</a>
+      </div>
+      <div class="hero-stats">
+        <div><span class="num">500+</span><span class="label">Verified farmers</span></div>
+        <div><span class="num">12K</span><span class="label">Orders delivered</span></div>
+        <div><span class="num">94%</span><span class="label">Avg. freshness score</span></div>
+      </div>
+    </div>
+    <div class="scan-stage">
+      <div class="scan-produce" id="hero-icon"></div>
+      <div class="scan-line"></div>
+      <div class="scan-readout">
+        <span>ID #FR-0386 · SCANNING</span>
+        <span class="grade">GRADE A+</span>
+      </div>
+    </div>
+  </div>
+</header>
+ 
+<section id="categories">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Browse</span>
+        <h2>Shop by category</h2>
+      </div>
+      <p>From leafy greens to grain sacks — every category sourced within 48 hours of harvest.</p>
+    </div>
+    <div class="category-grid" id="category-grid"></div>
+  </div>
+</section>
+ 
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Just scanned</span>
+        <h2>Fresh off the farm</h2>
+      </div>
+      <a href="shop.html" class="btn btn-ghost">View full market</a>
+    </div>
+    <div class="product-grid" id="featured-grid"></div>
+  </div>
+</section>
+ 
+<footer>
+  <div class="container footer-inner">
+    <p>&copy; 2026 Fresh Roots. Farm-to-consumer platform.</p>
+    <div class="footer-links">
+      <a href="shop.html">Shop</a>
+      <a href="farmer/dashboard.html">Farmers</a>
+      <a href="login.html">Account</a>
+    </div>
+  </div>
+</footer>
+ 
+<script src="js/products.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/script.js"></script>
+<script>
+  document.getElementById('hero-icon').innerHTML = ICONS.tomato;
+  document.getElementById('category-grid').innerHTML = CATEGORIES.map(categoryCardHTML).join('');
+  renderGrid(document.getElementById('featured-grid'), PRODUCTS.slice(0, 8));
+</script>
+</body>
+</html>
+ 
+———————
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — Fresh Roots</title>
+<meta name="description" content="Browse fresh, farm-graded produce sold directly by the growers who picked it.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+ 
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><span class="dot"></span>Fresh<span>Roots</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="farmer/dashboard.html">Sell on Fresh Roots</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="nav-icon-btn" aria-label="Account">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+      </a>
+      <a href="cart.html" class="nav-icon-btn" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg>
+        <span class="cart-count">0</span>
+      </a>
+      <button class="menu-toggle" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+ 
+<section style="padding-top:48px;">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">The market</span>
+        <h2>Every listing, scanned fresh</h2>
+      </div>
+      <p id="result-count">Showing all products</p>
+    </div>
+ 
+    <div class="filter-bar" id="filter-bar">
+      <button class="chip active" data-category="All">All</button>
+      <button class="chip" data-category="Vegetables">Vegetables</button>
+      <button class="chip" data-category="Fruits">Fruits</button>
+      <button class="chip" data-category="Dairy">Dairy</button>
+      <button class="chip" data-category="Grains">Grains</button>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="search-input" placeholder="Search produce or farmer…">
+      </div>
+    </div>
+ 
+    <div class="product-grid" id="shop-grid"></div>
+    <p class="empty-state" id="empty-state">No products match your search. Try another term or category.</p>
+  </div>
+</section>
+ 
+<footer>
+  <div class="container footer-inner">
+    <p>&copy; 2026 Fresh Roots. Farm-to-consumer platform.</p>
+    <div class="footer-links">
+      <a href="shop.html">Shop</a>
+      <a href="farmer/dashboard.html">Farmers</a>
+      <a href="login.html">Account</a>
+    </div>
+  </div>
+</footer>
+ 
+<script src="js/products.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/script.js"></script>
+<script>
+  const shopGrid = document.getElementById('shop-grid');
+  const emptyState = document.getElementById('empty-state');
+  const resultCount = document.getElementById('result-count');
+  const searchInput = document.getElementById('search-input');
+  const chips = document.querySelectorAll('#filter-bar .chip');
+ 
+  const params = new URLSearchParams(window.location.search);
+  let activeCategory = params.get('category') || 'All';
+  let activeSearch = '';
+ 
+  function syncActiveChip() {
+    chips.forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.category === activeCategory);
+    });
+  }
+ 
+  function applyFilters() {
+    let results = PRODUCTS.filter(p => activeCategory === 'All' || p.category === activeCategory);
+    if (activeSearch.trim()) {
+      const q = activeSearch.trim().toLowerCase();
+      results = results.filter(p => p.name.toLowerCase().includes(q) || p.farmer.toLowerCase().includes(q));
+    }
+    renderGrid(shopGrid, results);
+    emptyState.style.display = results.length ? 'none' : 'block';
+    resultCount.textContent = results.length
+      ? `Showing ${results.length} product${results.length === 1 ? '' : 's'}`
+      : 'No matches';
+  }
+ 
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      activeCategory = chip.dataset.category;
+      syncActiveChip();
+      applyFilters();
+    });
+  });
+ 
+  searchInput.addEventListener('input', (e) => {
+    activeSearch = e.target.value;
+    applyFilters();
+  });
+ 
+  syncActiveChip();
+  applyFilters();
+</script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Dashboard — Fresh Roots</title>
+  <meta name="description" content="Manage your farm products and orders on Fresh Roots.">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Farmer-specific styles */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-line);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .stat-card .label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+    .stat-card .value {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      color: var(--yellow);
+    }
+    .stat-card .sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--surface-line);
+    }
+    .orders-table th {
+      text-align: left;
+      padding: 14px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-faint);
+      border-bottom: 1px solid var(--surface-line);
+    }
+    .orders-table td {
+      padding: 14px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--surface-line);
+    }
+    .orders-table tr:last-child td {
+      border-bottom: none;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.03em;
+    }
+    .status-pending { background: rgba(255, 210, 63, 0.15); color: var(--yellow); }
+    .status-confirmed { background: rgba(107, 203, 61, 0.15); color: var(--green); }
+    .status-shipped { background: rgba(255, 107, 53, 0.15); color: var(--orange); }
+    .status-delivered { background: rgba(241, 247, 237, 0.1); color: var(--text-dim); }
+    .dashboard-actions {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .orders-table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Farmer Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="dashboard.html" class="logo"><span class="dot"></span>Fresh<span>Roots</span></a>
+      <ul class="farmer-nav-segment">
+        <li>
+          <a href="dashboard.html" class="active" data-i18n="dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="add-product.html" data-i18n="addProduct">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+            Add Product
+          </a>
+        </li>
+        <li>
+          <a href="orders.html" data-i18n="orders">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+          </a>
+        </li>
+        <li>
+          <a href="../index.html" data-i18n="viewStore">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            View Store
+          </a>
+        </li>
+      </ul>
+      <div class="nav-actions" style="display:flex; align-items:center; gap:12px;">
+        <!-- Language selector for Farmers -->
+        <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+          <option value="en">English</option>
+          <option value="te">తెలుగు (Telugu)</option>
+          <option value="hi">हिंदी (Hindi)</option>
+        </select>
+        <!-- High Contrast Daylight Mode -->
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Daylight Mode">☀️ Daylight</button>
+        <a href="../login.html" class="nav-icon-btn" aria-label="Logout" title="Logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding: 48px 0 80px;">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow" data-i18n="mandiTitle">Farmer Console</span>
+        <h2 data-i18n="dashboard">Farm Dashboard</h2>
+      </div>
+      <a href="add-product.html" class="btn btn-primary" data-i18n="listNewProduct">+ List New Product</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label" data-i18n="totalRevenue">Total Revenue</div>
+        <div class="value">₹24,850</div>
+        <div class="sub">Direct bank/UPI transfer</div>
+      </div>
+      <div class="stat-card">
+        <div class="label" data-i18n="orders">Orders</div>
+        <div class="value" id="stats-orders-count">38</div>
+        <div class="sub">6 pending dispatch</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Active Crops Listed</div>
+        <div class="value" id="stats-crops-count">10</div>
+        <div class="sub">Direct to consumer</div>
+      </div>
+      <div class="stat-card">
+        <div class="label" data-i18n="freshnessScore">Avg Freshness</div>
+        <div class="value">93%</div>
+        <div class="sub">Quality Grade A</div>
+      </div>
+    </div>
+
+    <!-- Mandi & MSP Price Intelligence for Farmers -->
+    <div class="section-head" style="margin-top: 10px;">
+      <div>
+        <span class="eyebrow">Market Advisory · Mandi Live</span>
+        <h2 data-i18n="mandiTitle">Mandi / MSP Live Price Intelligence</h2>
+      </div>
+      <p style="font-size:13px; color:var(--text-dim);">Compare today's APMC wholesale Mandi benchmark with your direct FreshRoots selling price.</p>
+    </div>
+
+    <div id="mandi-price-cards" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; margin-bottom:36px;">
+      <!-- Populated dynamically by JS -->
+    </div>
+
+    <!-- Quick actions -->
+    <div class="dashboard-actions">
+      <a href="add-product.html" class="btn btn-ghost" data-i18n="addProduct">⚡ Add Crop with 1-Click Presets</a>
+      <a href="orders.html" class="btn btn-ghost" data-i18n="orders">📦 Manage Customer Orders</a>
+      <button onclick="toggleTheme()" class="btn btn-ghost">☀️ Toggle Outdoor Sunlight Visibility</button>
+    </div>
+
+    <!-- Recent orders -->
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Customer Orders</span>
+        <h2 data-i18n="orders">Recent Orders</h2>
+      </div>
+      <a href="orders.html" class="btn btn-ghost">View all orders</a>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="orders-table" id="recent-orders">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th data-i18n="customer">Customer</th>
+            <th>Items</th>
+            <th data-i18n="total">Total</th>
+            <th data-i18n="status">Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <p>&copy; 2026 Fresh Roots. Farmer-first agricultural platform.</p>
+      <div class="footer-links">
+        <a href="dashboard.html" data-i18n="dashboard">Dashboard</a>
+        <a href="add-product.html" data-i18n="addProduct">Add Product</a>
+        <a href="orders.html" data-i18n="orders">Orders</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/products.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="../js/farmer.js"></script>
+  <script>
+    async function loadMandiAdvisory() {
+      const container = document.getElementById('mandi-price-cards');
+      if (!container) return;
+      const prices = await fetchMandiPrices();
+      if (!prices || !prices.length) {
+        container.innerHTML = '<p style="color:var(--text-dim);">Loading mandi rates...</p>';
+        return;
+      }
+      container.innerHTML = prices.slice(0, 4).map(p => `
+        <div style="background:var(--surface); border:1px solid var(--surface-line); border-radius:var(--radius); padding:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <strong style="font-size:16px;">${p.crop}</strong>
+            <span style="font-size:11px; font-family:var(--font-mono); color:var(--green); background:rgba(107,203,61,0.12); padding:3px 8px; border-radius:12px;">${p.trend}</span>
+          </div>
+          <div style="font-size:13px; color:var(--text-dim); margin-bottom:4px;">Mandi: <strong style="color:var(--text);">${p.mandiRate}</strong></div>
+          <div style="font-size:12px; color:var(--text-faint); margin-bottom:8px;">MSP Base: ${p.msp}</div>
+          <div style="font-size:12px; color:var(--yellow); font-style:italic;">💡 ${p.advice}</div>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await renderRecentOrders();
+      await loadMandiAdvisory();
+      if (document.getElementById('stats-orders-count')) {
+        document.getElementById('stats-orders-count').textContent = ORDERS.length;
+      }
+      if (document.getElementById('stats-crops-count')) {
+        document.getElementById('stats-crops-count').textContent = PRODUCTS.length;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Product — Fresh Roots Farmer</title>
+  <meta name="description" content="List a new farm product on Fresh Roots.">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-line);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-field label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .form-field input, .form-field select, .form-field textarea {
+      background: var(--bg);
+      border: 1.5px solid var(--surface-line);
+      border-radius: 10px;
+      padding: 13px 16px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+      background: var(--surface);
+    }
+    .form-field textarea {
+      resize: vertical;
+      min-height: 90px;
+      line-height: 1.5;
+    }
+    .preview-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 32px;
+      gap: 12px;
+    }
+    .preview-wrap .product-card {
+      width: 100%;
+      max-width: 320px;
+      pointer-events: none;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.15);
+    }
+    .range-value {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--green);
+    }
+    @media (max-width: 700px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Farmer Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="dashboard.html" class="logo"><span class="dot"></span>Fresh<span>Roots</span></a>
+      <ul class="farmer-nav-segment">
+        <li>
+          <a href="dashboard.html" data-i18n="dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="add-product.html" class="active" data-i18n="addProduct">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+            Add Product
+          </a>
+        </li>
+        <li>
+          <a href="orders.html" data-i18n="orders">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+          </a>
+        </li>
+        <li>
+          <a href="../index.html" data-i18n="viewStore">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            View Store
+          </a>
+        </li>
+      </ul>
+      <div class="nav-actions" style="display:flex; align-items:center; gap:12px;">
+        <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+          <option value="en">English</option>
+          <option value="te">తెలుగు (Telugu)</option>
+          <option value="hi">हिंदी (Hindi)</option>
+        </select>
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Daylight Mode">☀️ Daylight</button>
+        <a href="../login.html" class="nav-icon-btn" aria-label="Logout" title="Logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding: 48px 0 80px; max-width: 800px;">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow" data-i18n="cropPresets">Farmer Crop Listing</span>
+        <h2 data-i18n="addProduct">Add Harvest / Crop</h2>
+      </div>
+    </div>
+
+    <!-- Farmer Quick Presets Bar (Solves cumbersome typing for field farmers) -->
+    <div style="background:var(--surface); border:1px solid var(--surface-line); border-radius:var(--radius); padding:20px; margin-bottom:28px; box-shadow:0 4px 14px rgba(0,0,0,0.04);">
+      <div style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:10px;" data-i18n="cropPresets">
+        ⚡ 1-Click Crop Presets (Tap to fill details instantly):
+      </div>
+      <div class="preset-chips" id="preset-buttons">
+        <button type="button" class="preset-chip" onclick="applyPreset('tomatoes')">🍅 Fresh Tomatoes (₹42/kg)</button>
+        <button type="button" class="preset-chip" onclick="applyPreset('spinach')">🥬 Organic Palak / Spinach (₹28/bunch)</button>
+        <button type="button" class="preset-chip" onclick="applyPreset('carrots')">🥕 Farm Carrots (₹35/kg)</button>
+        <button type="button" class="preset-chip" onclick="applyPreset('mangoes')">🥭 Sweet Mangoes (₹300/doz)</button>
+        <button type="button" class="preset-chip" onclick="applyPreset('milk')">🥛 Pure Cow Milk (₹70/L)</button>
+        <button type="button" class="preset-chip" onclick="applyPreset('rice')">🌾 Sona Masoori Rice (₹65/kg)</button>
+      </div>
+    </div>
+
+    <!-- Live preview -->
+    <div class="preview-wrap">
+      <span style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-dim);">
+        📱 Customer Card Preview (Live Update)
+      </span>
+      <div id="preview-container" style="width:100%; display:flex; justify-content:center;">
+        <!-- Product card preview goes here -->
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-card">
+      <form id="add-product-form">
+        <div class="form-grid">
+          <div class="form-field">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label for="prod-name">Product / Crop Name *</label>
+              <button type="button" id="voice-btn" style="background:none; border:none; color:var(--yellow); cursor:pointer; font-size:12px; display:inline-flex; align-items:center; gap:4px;" title="Voice to Text" onclick="startVoiceInput()">
+                🎤 Speak Name
+              </button>
+            </div>
+            <input type="text" id="prod-name" placeholder="e.g. Vine Tomatoes" required>
+          </div>
+          <div class="form-field">
+            <label for="prod-category">Category *</label>
+            <select id="prod-category" required>
+              <option value="Vegetables">Vegetables</option>
+              <option value="Fruits">Fruits</option>
+              <option value="Dairy">Dairy</option>
+              <option value="Grains">Grains</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="prod-price">Price (₹) *</label>
+            <input type="number" id="prod-price" min="1" required>
+          </div>
+          <div class="form-field">
+            <label for="prod-unit">Unit *</label>
+            <select id="prod-unit" required>
+              <option value="kg">kg</option>
+              <option value="bunch">bunch</option>
+              <option value="dozen">dozen</option>
+              <option value="box">box</option>
+              <option value="litre">litre</option>
+              <option value="250g">250g</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="prod-freshness">Freshness Score: <span class="range-value" id="freshness-val">90%</span></label>
+            <input type="range" id="prod-freshness" min="60" max="100" value="90">
+          </div>
+          <div class="form-field">
+            <label for="prod-icon">Icon *</label>
+            <select id="prod-icon" required>
+              <option value="tomato">Tomato</option>
+              <option value="leafy">Leafy Greens</option>
+              <option value="carrot">Carrot</option>
+              <option value="apple">Apple</option>
+              <option value="mango">Mango</option>
+              <option value="berry">Berry</option>
+              <option value="milk">Milk</option>
+              <option value="cheese">Cheese</option>
+              <option value="wheat">Wheat</option>
+              <option value="rice">Rice</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="prod-image">Photo URL (optional)</label>
+            <input type="text" id="prod-image" placeholder="https://... leave blank to use icon">
+          </div>
+          <div class="form-field">
+            <label for="prod-farmer">Farmer Name / Farm *</label>
+            <input type="text" id="prod-farmer" required>
+          </div>
+          <div class="form-field">
+            <label for="prod-origin">Origin *</label>
+            <input type="text" id="prod-origin" placeholder="e.g., Telangana" required>
+          </div>
+          <div class="form-field" style="grid-column: span 2;">
+            <label for="prod-description">Description *</label>
+            <textarea id="prod-description" required></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 24px;">List Product</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <p>&copy; 2026 Fresh Roots. Farmer dashboard.</p>
+      <div class="footer-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="add-product.html">Add Product</a>
+        <a href="orders.html">Orders</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/products.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="../js/farmer.js"></script>
+  <script>
+    // Live preview update
+    const form = document.getElementById('add-product-form');
+    const previewContainer = document.getElementById('preview-container');
+    const freshnessRange = document.getElementById('prod-freshness');
+    const freshnessVal = document.getElementById('freshness-val');
+
+    function updatePreview() {
+      const name = document.getElementById('prod-name').value || 'Product Name';
+      const category = document.getElementById('prod-category').value;
+      const price = document.getElementById('prod-price').value || '0';
+      const unit = document.getElementById('prod-unit').value;
+      const farmer = document.getElementById('prod-farmer').value || 'Farmer Name';
+      const icon = document.getElementById('prod-icon').value;
+      const freshness = freshnessRange.value;
+      const imageInput = document.getElementById('prod-image').value.trim();
+
+      const tempProduct = {
+        id: 0,
+        name,
+        category,
+        price: Number(price),
+        unit,
+        farmer,
+        freshness: Number(freshness),
+        grade: 'A',
+        icon,
+        image: imageInput || `../images/${icon}.jpg`,
+        harvested: 'Just now',
+        origin: document.getElementById('prod-origin').value || 'Telangana',
+        description: ''
+      };
+
+      previewContainer.innerHTML = productCardHTML(tempProduct);
+      const card = previewContainer.querySelector('.product-card');
+      if (card) card.classList.add('in-view');
+    }
+
+    // Update freshness label
+    freshnessRange.addEventListener('input', () => {
+      freshnessVal.textContent = freshnessRange.value + '%';
+      updatePreview();
+    });
+
+    // Update preview on any input change
+    form.addEventListener('input', updatePreview);
+    form.addEventListener('change', updatePreview);
+
+    // Initial preview
+    updatePreview();
+
+    // Crop Presets data for quick 1-click filing
+    const CROP_PRESETS = {
+      tomatoes: {
+        name: 'Vine-Ripened Country Tomatoes',
+        category: 'Vegetables',
+        price: 42,
+        unit: 'kg',
+        icon: 'tomato',
+        farmer: 'Ravi Kumar Farm · Warangal',
+        origin: 'Telangana',
+        freshness: 95,
+        description: 'Juicy, naturally ripened farm tomatoes harvested this morning. Zero chemical storage.'
+      },
+      spinach: {
+        name: 'Organic Desi Palak (Spinach)',
+        category: 'Vegetables',
+        price: 28,
+        unit: 'bunch',
+        icon: 'leafy',
+        farmer: 'Lakshmi Devi · Medak',
+        origin: 'Telangana',
+        freshness: 94,
+        description: 'Pesticide-free tender green leaves. Washed in clean well-water and bunched fresh.'
+      },
+      carrots: {
+        name: 'Crisp Red Farm Carrots',
+        category: 'Vegetables',
+        price: 35,
+        unit: 'kg',
+        icon: 'carrot',
+        farmer: 'S. Faiz Organic Farm · Nizamabad',
+        origin: 'Telangana',
+        freshness: 92,
+        description: 'Freshly dug sweet carrots with lush green tops, cleaned and graded.'
+      },
+      mangoes: {
+        name: 'Tree-Ripened Banganapalli Mangoes',
+        category: 'Fruits',
+        price: 300,
+        unit: 'dozen',
+        icon: 'mango',
+        farmer: 'Krishna Valley Orchards · Jagtial',
+        origin: 'Telangana',
+        freshness: 93,
+        description: 'Naturally grass-ripened, carbide-free golden sweet mangoes.'
+      },
+      milk: {
+        name: 'Fresh Grass-Fed Cow Milk',
+        category: 'Dairy',
+        price: 70,
+        unit: 'litre',
+        icon: 'milk',
+        farmer: 'Pradeep Desi Dairy · Kompally',
+        origin: 'Telangana',
+        freshness: 98,
+        description: 'Chilled raw whole milk packaged within 3 hours of morning milking.'
+      },
+      rice: {
+        name: 'Traditional Sona Masoori Rice (Aged)',
+        category: 'Grains',
+        price: 65,
+        unit: 'kg',
+        icon: 'rice',
+        farmer: 'Godavari Paddy Fields · Nalgonda',
+        origin: 'Telangana',
+        freshness: 90,
+        description: 'Naturally dried paddy grain, unpolished, aromatic and easy to digest.'
+      }
+    };
+
+    function applyPreset(key) {
+      const data = CROP_PRESETS[key];
+      if (!data) return;
+      document.getElementById('prod-name').value = data.name;
+      document.getElementById('prod-category').value = data.category;
+      document.getElementById('prod-price').value = data.price;
+      document.getElementById('prod-unit').value = data.unit;
+      document.getElementById('prod-icon').value = data.icon;
+      document.getElementById('prod-farmer').value = data.farmer;
+      document.getElementById('prod-origin').value = data.origin;
+      document.getElementById('prod-description').value = data.description;
+      freshnessRange.value = data.freshness;
+      freshnessVal.textContent = data.freshness + '%';
+
+      // Mark clicked preset chip
+      document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+      const activeBtn = event ? event.target.closest('.preset-chip') : null;
+      if (activeBtn) activeBtn.classList.add('active');
+
+      updatePreview();
+      showToast(`Autofilled details for ${data.name}!`);
+    }
+
+    // Voice recognition for hands-free crop naming
+    function startVoiceInput() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showToast('Voice typing not supported in this browser.');
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = getLang() === 'te' ? 'te-IN' : getLang() === 'hi' ? 'hi-IN' : 'en-IN';
+      const voiceBtn = document.getElementById('voice-btn');
+      voiceBtn.textContent = '🔴 Listening...';
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('prod-name').value = transcript;
+        updatePreview();
+        showToast(`Heard: "${transcript}"`);
+        voiceBtn.textContent = '🎤 Speak Name';
+      };
+
+      recognition.onerror = () => {
+        voiceBtn.textContent = '🎤 Speak Name';
+        showToast('Could not hear audio. Please try again.');
+      };
+
+      recognition.onend = () => {
+        voiceBtn.textContent = '🎤 Speak Name';
+      };
+
+      recognition.start();
+    }
+
+    // Form submit
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const productData = {
+        name: document.getElementById('prod-name').value,
+        category: document.getElementById('prod-category').value,
+        price: Number(document.getElementById('prod-price').value),
+        unit: document.getElementById('prod-unit').value,
+        freshness: Number(freshnessRange.value),
+        grade: freshnessRange.value >= 90 ? 'A+' : 'A',
+        icon: document.getElementById('prod-icon').value,
+        image: document.getElementById('prod-image').value.trim() || null,
+        farmer: document.getElementById('prod-farmer').value,
+        origin: document.getElementById('prod-origin').value,
+        description: document.getElementById('prod-description').value,
+        harvested: 'Just now'
+      };
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Listing to market...';
+
+      try {
+        const newId = await addFarmerProduct(productData);
+        showToast(`✅ Crop published successfully! (ID: #${newId})`);
+        form.reset();
+        freshnessRange.value = 90;
+        freshnessVal.textContent = '90%';
+        updatePreview();
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1200);
+      } catch (err) {
+        showToast('Error listing crop. Please retry.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'List Product';
+      }
+    });
+  </script>
+</body>
+</html>
